@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>今日のあなたの夜ご飯ルーレット</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Hiragino Kaku Gothic ProN",
+        "Yu Gothic",
+        sans-serif;
+
+      background:
+        radial-gradient(circle at top, #fff8df, #f1eadc);
+
+      color: #292929;
+    }
+
+    .app {
+      width: min(92%, 600px);
+      padding: 42px 30px;
+
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 30px;
+
+      text-align: center;
+
+      box-shadow:
+        0 25px 70px rgba(0, 0, 0, 0.10);
+    }
+
+    .small {
+      color: #999;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 8px 0 10px;
+
+      font-size: clamp(27px, 7vw, 42px);
+      letter-spacing: 0.04em;
+    }
+
+    .description {
+      color: #777;
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .result-area {
+      margin: 35px 0 25px;
+      padding: 35px 15px;
+
+      border-radius: 22px;
+
+      background: #faf8f2;
+      border: 1px solid #eee8da;
+    }
+
+    #food {
+      min-height: 55px;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+      font-size: clamp(28px, 8vw, 46px);
+      font-weight: 800;
+
+      transition: 0.2s;
+    }
+
+    #info {
+      margin-top: 14px;
+
+      color: #888;
+      font-size: 14px;
+    }
+
+    #food.pop {
+      animation: pop 0.35s ease;
+    }
+
+    @keyframes pop {
+      0% {
+        transform: scale(0.85);
+        opacity: 0;
+      }
+
+      70% {
+        transform: scale(1.08);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    button {
+      width: 100%;
+      max-width: 350px;
+
+      padding: 17px 25px;
+
+      border: none;
+      border-radius: 999px;
+
+      background: #292929;
+      color: white;
+
+      font-size: 17px;
+      font-weight: bold;
+
+      cursor: pointer;
+
+      transition:
+        transform 0.15s,
+        background 0.15s;
+    }
+
+    button:hover {
+      background: #444;
+      transform: translateY(-2px);
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    select {
+      padding: 10px 15px;
+
+      border: 1px solid #ddd;
+      border-radius: 999px;
+
+      background: white;
+
+      font-size: 14px;
+    }
+
+    .history {
+      margin-top: 35px;
+      padding-top: 20px;
+
+      border-top: 1px solid #e8e3d8;
+    }
+
+    .history-title {
+      font-size: 12px;
+      color: #aaa;
+    }
+
+    #history {
+      margin-top: 10px;
+
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 7px;
+    }
+
+    .history-item {
+      padding: 6px 10px;
+
+      border-radius: 999px;
+
+      background: #f1eee6;
+      color: #777;
+
+      font-size: 12px;
+    }
+
+    .note {
+      margin-top: 25px;
+
+      color: #bbb;
+      font-size: 11px;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <div class="small">
+      WORLD FOOD RANDOMIZER
+    </div>
+
+    <h1>世界の食べ物ルーレット</h1>
+
+    <div class="description">
+      世界中の料理・食材から<br>
+      今日食べるものを勝手に決めます。
+    </div>
+
+    <section class="result-area">
+
+      <div id="food">
+        ？？？
+      </div>
+
+      <div id="info">
+        ボタンを押してください
+      </div>
+
+    </section>
+
+    <button onclick="chooseFood()">
+      🌎 世界から選ぶ
+    </button>
+
+    <div class="controls">
+
+      <select id="category">
+        <option value="all">🌎 すべて</option>
+        <option value="japan">🇯🇵 日本</option>
+        <option value="asia">🌏 アジア</option>
+        <option value="europe">🇪🇺 ヨーロッパ</option>
+        <option value="america">🌎 南北アメリカ</option>
+        <option value="africa">🌍 アフリカ</option>
+        <option value="middleeast">🕌 中東</option>
+        <option value="dessert">🍰 デザート</option>
+        <option value="ingredient">🥕 食材</option>
+      </select>
+
+    </div>
+
+    <div class="history">
+
+      <div class="history-title">
+        最近選ばれたもの
+      </div>
+
+      <div id="history">
+        まだありません
+      </div>
+
+    </div>
+
+    <div class="note">
+      ※「世界で見つかっているすべて」を完全に網羅するものではありません。<br>
+      食文化や料理名は地域・資料によって分類が異なります。
+    </div>
+
+  </main>
+
+
+  <script>
+
+    /*
+      ========================================
+      世界の食べ物データ
+      ========================================
+
+      name     : 食べ物の名前
+      country  : 主な地域・国
+      category : 分類
+
+      ここにデータを追加するだけで、
+      ルーレットの候補を増やせます。
+    */
+
+    const foods = [
+
+      // 🇯🇵 日本
+      { name: "寿司", country: "日本", category: "japan" },
+      { name: "天ぷら", country: "日本", category: "japan" },
+      { name: "ラーメン", country: "日本", category: "japan" },
+      { name: "うどん", country: "日本", category: "japan" },
+      { name: "そば", country: "日本", category: "japan" },
+      { name: "お好み焼き", country: "日本", category: "japan" },
+      { name: "たこ焼き", country: "日本", category: "japan" },
+      { name: "親子丼", country: "日本", category: "japan" },
+      { name: "カレーライス", country: "日本", category: "japan" },
+      { name: "おでん", country: "日本", category: "japan" },
+      { name: "焼き鳥", country: "日本", category: "japan" },
+
+      // 🌏 アジア
+      { name: "ビリヤニ", country: "インド", category: "asia" },
+      { name: "ナン", country: "インド", category: "asia" },
+      { name: "サモサ", country: "インド", category: "asia" },
+      { name: "バターチキン", country: "インド", category: "asia" },
+      { name: "フォー", country: "ベトナム", category: "asia" },
+      { name: "バインミー", country: "ベトナム", category: "asia" },
+      { name: "生春巻き", country: "ベトナム", category: "asia" },
+      { name: "トムヤムクン", country: "タイ", category: "asia" },
+      { name: "パッタイ", country: "タイ", category: "asia" },
+      { name: "グリーンカレー", country: "タイ", category: "asia" },
+      { name: "ガパオライス", country: "タイ", category: "asia" },
+      { name: "餃子", country: "中国", category: "asia" },
+      { name: "麻婆豆腐", country: "中国", category: "asia" },
+      { name: "小籠包", country: "中国", category: "asia" },
+      { name: "北京ダック", country: "中国", category: "asia" },
+      { name: "炒飯", country: "中国", category: "asia" },
+      { name: "火鍋", country: "中国", category: "asia" },
+      { name: "韓国冷麺", country: "韓国", category: "asia" },
+      { name: "ビビンバ", country: "韓国", category: "asia" },
+      { name: "キンパ", country: "韓国", category: "asia" },
+      { name: "トッポギ", country: "韓国", category: "asia" },
+
+      // 🇪🇺 ヨーロッパ
+      { name: "ピザ", country: "イタリア", category: "europe" },
+      { name: "パスタ", country: "イタリア", category: "europe" },
+      { name: "リゾット", country: "イタリア", category: "europe" },
+      { name: "ラザニア", country: "イタリア", category: "europe" },
+      { name: "カルボナーラ", country: "イタリア", category: "europe" },
+      { name: "パエリア", country: "スペイン", category: "europe" },
+      { name: "ガスパチョ", country: "スペイン", category: "europe" },
+      { name: "フィッシュ＆チップス", country: "イギリス", category: "europe" },
+      { name: "シェパーズパイ", country: "イギリス", category: "europe" },
+      { name: "ムサカ", country: "ギリシャ", category: "europe" },
+      { name: "ソーセージ", country: "ドイツ", category: "europe" },
+      { name: "ザワークラウト", country: "ドイツ", category: "europe" },
+      { name: "ハンガリー風グヤーシュ", country: "ハンガリー", category: "europe" },
+      { name: "クレープ", country: "フランス", category: "europe" },
+      { name: "キッシュ", country: "フランス", category: "europe" },
+
+      // 🌎 南北アメリカ
+      { name: "ハンバーガー", country: "アメリカ", category: "america" },
+      { name: "ホットドッグ", country: "アメリカ", category: "america" },
+      { name: "バーベキュー", country: "アメリカ", category: "america" },
+      { name: "タコス", country: "メキシコ", category: "america" },
+      { name: "ブリトー", country: "メキシコ", category: "america" },
+      { name: "ナチョス", country: "メキシコ", category: "america" },
+      { name: "セビーチェ", country: "ペルー", category: "america" },
+      { name: "アレパ", country: "コロンビア", category: "america" },
+      { name: "フェイジョアーダ", country: "ブラジル", category: "america" },
+
+      // 🌍 アフリカ
+      { name: "クスクス", country: "北アフリカ", category: "africa" },
+      { name: "タジン", country: "モロッコ", category: "africa" },
+      { name: "ジョロフライス", country: "西アフリカ", category: "africa" },
+      { name: "フフ", country: "西アフリカ", category: "africa" },
+      { name: "インジェラ", country: "エチオピア", category: "africa" },
+      { name: "チキン・ヤッサ", country: "セネガル", category: "africa" },
+
+      // 🕌 中東
+      { name: "フムス", country: "中東", category: "middleeast" },
+      { name: "ファラフェル", country: "中東", category: "middleeast" },
+      { name: "シャワルマ", country: "中東", category: "middleeast" },
+      { name: "ケバブ", country: "トルコ周辺", category: "middleeast" },
+      { name: "バクラヴァ", country: "中東・東地中海", category: "middleeast" },
+      { name: "タブーレ", country: "レバノン周辺", category: "middleeast" },
+
+      // 🍰 デザート
+      { name: "ティラミス", country: "イタリア", category: "dessert" },
+      { name: "ジェラート", country: "イタリア", category: "dessert" },
+      { name: "パンナコッタ", country: "イタリア", category: "dessert" },
+      { name: "モンブラン", country: "ヨーロッパ", category: "dessert" },
+      { name: "チーズケーキ", country: "世界各地", category: "dessert" },
+      { name: "ドーナツ", country: "世界各地", category: "dessert" },
+      { name: "プリン", country: "世界各地", category: "dessert" },
+      { name: "月餅", country: "中国", category: "dessert" },
+      { name: "杏仁豆腐", country: "中国", category: "dessert" },
+      { name: "マンゴースティッキーライス", country: "タイ", category: "dessert" },
+
+      // 🥕 食材
+      { name: "トマト", country: "世界各地", category: "ingredient" },
+      { name: "じゃがいも", country: "世界各地", category: "ingredient" },
+      { name: "玉ねぎ", country: "世界各地", category: "ingredient" },
+      { name: "にんじん", country: "世界各地", category: "ingredient" },
+      { name: "アボカド", country: "世界各地", category: "ingredient" },
+      { name: "マンゴー", country: "世界各地", category: "ingredient" },
+      { name: "ドラゴンフルーツ", country: "東南アジアなど", category: "ingredient" },
+      { name: "ドリアン", country: "東南アジア", category: "ingredient" },
+      { name: "パッションフルーツ", country: "南米など", category: "ingredient" },
+      { name: "ザクロ", country: "中東など", category: "ingredient" }
+    ];
+
+
+    /*
+      ========================================
+      ランダム選択
+      ========================================
+    */
+
+    let history = [];
+
+
+    function chooseFood() {
+
+      const category =
+        document.getElementById("category").value;
+
+      let candidates;
+
+      if (category === "all") {
+
+        candidates = foods;
+
+      } else {
+
+        candidates =
+          foods.filter(food =>
+            food.category === category
+          );
+
+      }
+
+      if (candidates.length === 0) {
+        return;
+      }
+
+
+      /*
+        直前と同じ食べ物が
+        連続で出ないようにする
+      */
+
+      let selected;
+
+      do {
+
+        selected =
+          candidates[
+            Math.floor(
+              Math.random() * candidates.length
+            )
+          ];
+
+      } while (
+        candidates.length > 1 &&
+        history.length > 0 &&
+        selected.name === history[0].name
+      );
+
+
+      const foodElement =
+        document.getElementById("food");
+
+      const infoElement =
+        document.getElementById("info");
+
+
+      foodElement.classList.remove("pop");
+
+      /*
+        一瞬だけルーレットっぽくする
+      */
+
+      foodElement.textContent = "？？？";
+      infoElement.textContent = "世界中から探しています…";
+
+
+      setTimeout(() => {
+
+        foodElement.textContent =
+          selected.name;
+
+        infoElement.textContent =
+          selected.country;
+
+        foodElement.classList.add("pop");
+
+
+        /*
+          履歴に追加
+        */
+
+        history.unshift(selected);
+
+        history =
+          history.slice(0, 8);
+
+
+        updateHistory();
+
+      }, 350);
+
+    }
+
+
+    /*
+      ========================================
+      履歴表示
+      ========================================
+    */
+
+    function updateHistory() {
+
+      const historyElement =
+        document.getElementById("history");
+
+
+      if (history.length === 0) {
+
+        historyElement.textContent =
+          "まだありません";
+
+        return;
+      }
+
+
+      historyElement.innerHTML =
+        history
+          .map(food =>
+            `<span class="history-item">
+              ${food.name}
+            </span>`
+          )
+          .join("");
+
+    }
+
+  </script>
+
+</body>
+</html>
